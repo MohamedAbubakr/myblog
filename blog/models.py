@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+
 class Author(models.Model):
     """Model representing an author."""
     name = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
@@ -17,6 +18,7 @@ class Author(models.Model):
         """Returns the url to access a particular author instance."""
         return reverse('author-detail', args=[str(self.id)])
 
+
 class Blog(models.Model):
     post = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True, blank=True)
@@ -30,6 +32,7 @@ class Blog(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a detail record for this blog."""
         return reverse('blog-detail', args=[str(self.id)])
+
 
 class Comment(models.Model):
     comment_text = models.TextField(null=False)
