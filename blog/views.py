@@ -14,9 +14,14 @@ def index(request):
     }
     return render(request, 'index.html', context = context)
 
+def draw(request):
+    context = {
+        'drawing': 'Draw here'
+    }
+    return render(request, 'blog/blog_draw.html', context = context)
+
 class BlogListView(generic.ListView):
     model = Blog
-    paginate_by = 1
 
 class BlogDetailView(generic.DetailView):
     model = Blog

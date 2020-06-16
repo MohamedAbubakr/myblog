@@ -8,4 +8,5 @@ urlpatterns = [
     path('bloggers', views.BloggerListView.as_view(), name='bloggers'),
     path('blogger/<int:pk>', views.AuthorDetailView.as_view(), name='author-detail'),
     path('<int:pk>/comment', views.AddComment.as_view(), name='comment-form'),
+    path('draw', views.draw, name='draw'),
 ]

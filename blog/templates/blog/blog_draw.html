@@ -1,0 +1,162 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Blog Drawing</h1>
+    <p><strong>Drawing:</strong> {{ drawing }}</p>
+    <div id="svg-target"></div>
+</body>
+<style>
+    svg {
+		width: 700px;
+		height: 500px;
+    }
+
+	#canvas {
+			background-color: #000;
+	}
+
+    path {
+        fill: none;
+		stroke: grey;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+    }
+</style>
+<script>
+    const targetDiv = document.getElementById('svg-target');
+    var svgNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	svgNode.setAttributeNS(null, 'id', 'canvas');
+	targetDiv.appendChild(svgNode);
+	var pathNode = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+	var dot = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+	var point = [];
+	var arr = [];
+    var controlPoint1X, controlPoint1Y, controlPoint2X, controlPoint2Y;
+    var x0, y0, x1, y1, x2, y2, x3, y3;
+    var xc1, yc1, xc2, yc2, xc3, yc3;
+    var len1, len2, len3;
+    var k1, k2;
+    var xm1, ym1, xm2, ym2;
+    let SMOOTH_VALUE = 0.75, i = 0;
+	var x = Number();
+    var y = Number();
+	var att;
+
+	function getCoordinates(){
+
+        var canvas = document.getElementById("svg-target");
+
+        if (event.x !== undefined && event.y !== undefined)
+        {
+          x = event.x;
+          y = event.y;
+        }
+        else // Firefox method to get the position
+        {
+          x = event.clientX + document.body.scrollLeft +
+              document.documentElement.scrollLeft;
+          y = event.clientY + document.body.scrollTop +
+              document.documentElement.scrollTop;
+        }
+
+        x -= canvas.offsetLeft;
+        y -= canvas.offsetTop;
+
+		return {
+			X : x - 226,
+			Y : y + 1
+		};
+	}
+    function drawSVG(a, b) {
+		point = [];
+		point[0] = a;
+		point[1] = b;
+
+		arr[i] = point;
+
+        if (i === 0) {
+			pathNode = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        }
+        else if (i > 2){
+
+			x0 = arr[i - 3][0];
+			y0 = arr[i - 3][1];
+			x1 = arr[i - 2][0];
+			y1 = arr[i - 2][1];
+			x2 = arr[i - 1][0];
+			y2 = arr[i - 1][1];
+			x3 = arr[i][0];
+			y3 = arr[i][1];
+
+			xc1 = (x0 + x1) / 2;
+			yc1 = (y0 + y1) / 2;
+			xc2 = (x1 + x2) / 2;
+			yc2 = (y1 + y2) / 2;
+			xc3 = (x2 + x3) / 2;
+			yc3 = (y2 + y3) / 2;
+
+			len1 = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+			len2 = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+			len3 = Math.sqrt((x3 - x2) * (x3 - x2) + (y3 - y2) * (y3 - y2));
+
+			k1 = len1 / (len1 + len2);
+			k2 = len2 / (len2 + len3);
+
+			xm1 = xc1 + (xc2 - xc1) * k1;
+			ym1 = yc1 + (yc2 - yc1) * k1;
+			xm2 = xc2 + (xc3 - xc2) * k2;
+			ym2 = yc2 + (yc3 - yc2) * k2;
+
+			controlPoint1X = (xm1 + (xc2 - xm1) * SMOOTH_VALUE + x1 - xm1).toFixed(2);
+			controlPoint1Y = (ym1 + (yc2 - ym1) * SMOOTH_VALUE + y1 - ym1).toFixed(2);
+			controlPoint2X = (xm2 + (xc2 - xm2) * SMOOTH_VALUE + x2 - xm2).toFixed(2);
+			controlPoint2Y = (ym2 + (yc2 - ym2) * SMOOTH_VALUE + y2 - ym2).toFixed(2);
+
+			att += ' C ' + controlPoint1X.toString() + ',' + controlPoint1Y.toString() + ' '
+				+ controlPoint2X.toString() + ',' + controlPoint2Y.toString() + ' ' + x2.toString() + ',' + y2.toString();
+
+			pathNode.setAttribute('d', att);
+
+			svgNode.appendChild(pathNode);
+		}
+        i += 1;
+    }
+
+	document.addEventListener("DOMContentLoaded", init, false);
+
+      function init()
+      {
+        var canvas = document.getElementById("svg-target");
+        canvas.addEventListener("mousedown", triggerDrawing, false);
+		canvas.addEventListener("mouseup", stopPosition, false);
+      }
+	  function stopPosition(event)
+      {
+		canvas.removeEventListener("mousemove", startDrawing, false);
+		arr = [];
+		i = 0;
+	  }
+      function triggerDrawing(event)
+      {
+		dot = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		var result = getCoordinates();
+
+		att = 'M ' + result.X.toString() + ',' + result.Y.toString() + ' C ' + result.X.toString() + ',' + (result.Y).toString()
+					+ ' ' + result.X.toString() + ',' + (result.Y).toString() + ' ' + result.X.toString() + ',' + result.Y.toString();
+
+		dot.setAttribute('d', att);
+
+		svgNode.appendChild(dot);
+
+		canvas.addEventListener("mousemove", startDrawing, false);
+	  }
+	  function startDrawing(event){
+		var result = getCoordinates();
+		drawSVG(result.X, result.Y);
+        {#console.log("("+result.X+","+result.Y+")");#}
+      }
+
+</script>
+
+{% endblock %}
