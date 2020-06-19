@@ -1,12 +1,14 @@
 from django.views import generic
 from django.contrib.auth.models import User
 from .models import Blog, Author, Comment
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormMixin
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from .forms import CommentForm
 
 
 def index(request):
@@ -43,8 +45,33 @@ class BlogListView(generic.ListView):
     model = Blog
 
 
-class BlogDetailView(generic.DetailView):
+class BlogDetailView(FormMixin, generic.DetailView):
     model = Blog
+    form_class = CommentForm
+
+    def get_context_data(self, **kwargs):
+        context = super(BlogDetailView, self).get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden()
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.blog = get_object_or_404(Blog, pk=self.kwargs['pk'])
+        form.save()
+        return super(BlogDetailView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('blog-detail', kwargs={'pk': self.kwargs['pk'], })
 
 
 class BloggerListView(generic.ListView):
@@ -102,7 +129,6 @@ class CreateAuthor(LoginRequiredMixin, CreateView):
         return super(CreateAuthor, self).form_valid(form)
 
     def get_success_url(self):
-
         return reverse('bloggers')
 
 
@@ -115,5 +141,4 @@ class CreateBlog(LoginRequiredMixin, CreateView):
         return super(CreateBlog, self).form_valid(form)
 
     def get_success_url(self):
-
         return reverse('blogs')
