@@ -13,4 +13,5 @@ urlpatterns = [
     path('create_author', views.CreateAuthor.as_view(), name='author-create'),
     path('create_blog', views.CreateBlog.as_view(), name='blog-create'),
     path(r'^signup/$', views.signup, name='signup'),
+    path('delete_comment/<int:comment_id>', views.delete_comment, name='comment-delete'),
 ]

@@ -2,25 +2,28 @@
 
 {% block content %}
 
-<h1><strong>All bloggers</strong></h1>
+    <div class="mt-4">
+    </div>
+    <h2 style="color: darkgray">
+      All Bloggers
+    </h2>
+    <div class="mb-4">
+
+    </div>
 
 {% if author_list %}
-  <ul>
-
+  <div class="col-sm-4 list-group">
   {% for author in author_list %}
-    <li>
-      <a href="{{ author.get_absolute_url }}">
+      <a class="ml-lg-4 list-group-item list-group-item-action list-group-item-dark" href="{{ author.get_absolute_url }}">
       {{ author }}
       </a>
-    </li>
-  {% endfor %}
+      <div class="mb-4">
 
- </ul>
+      </div>
+  {% endfor %}
+  </div>
 {% else %}
   <p>There are no bloggers available.</p>
 {% endif %}
-        
-        
-        
 {% endblock %}
 

@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, FormMixin
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from .forms import CommentForm
+from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
@@ -113,6 +114,14 @@ class AddComment(LoginRequiredMixin, CreateView):
         After posting comment return to associated blog.
         """
         return reverse('blog-detail', kwargs={'pk': self.kwargs['pk'], })
+
+
+@csrf_exempt
+def delete_comment(request, comment_id):
+    pk = Comment.objects.get(id=comment_id).blog.id
+    Comment.objects.get(id=comment_id).delete()
+
+    return redirect('/blog/' + str(pk))
 
 
 class CreateAuthor(LoginRequiredMixin, CreateView):
