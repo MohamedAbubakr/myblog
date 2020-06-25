@@ -50,11 +50,6 @@ class BlogDetailView(FormMixin, generic.DetailView):
     model = Blog
     form_class = CommentForm
 
-    def get_context_data(self, **kwargs):
-        context = super(BlogDetailView, self).get_context_data(**kwargs)
-        context['form'] = CommentForm()
-        return context
-
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return HttpResponseForbidden()
@@ -120,6 +115,16 @@ class AddComment(LoginRequiredMixin, CreateView):
 def delete_comment(request, comment_id):
     pk = Comment.objects.get(id=comment_id).blog.id
     Comment.objects.get(id=comment_id).delete()
+
+    return redirect('/blog/' + str(pk))
+
+
+@csrf_exempt
+def update_comment(request, comment_id):
+    pk = Comment.objects.get(id=comment_id).blog.id
+    obj = get_object_or_404(Comment, id=comment_id)
+    form = CommentForm(request.POST or None, instance=obj)
+    form.save()
 
     return redirect('/blog/' + str(pk))
 

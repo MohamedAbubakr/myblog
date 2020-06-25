@@ -21,6 +21,41 @@
                             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                         </form>
                     </div>
+                    <div class="mr-2 float-right">
+                        <button type="button" class="btn btn-sm btn-dark" data-toggle="modal" data-target="#exampleModal{{ comment.id }}">Edit</button>
+                    </div>
+                    <div class="modal fade" id="exampleModal{{ comment.id }}" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Edit</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+
+                            <form method="post" action="update_comment/{{ comment.id }}">
+                                <div class="modal-body">
+                              <div class="form-group">
+                                  <p>
+                                      <label for="id_comment_text">Comment:</label>
+                                      <textarea name="comment_text" cols="30" rows="1" placeholder="Write a comment..."
+                                                class="form-control" required id="id_comment_text">{{ comment }}
+                                      </textarea>
+                                  </p>
+{#                                <label for="message-text" class="col-form-label">Comment:</label>#}
+{#                                <textarea class="form-control" name="comment_text" id="{{ comment.id }}">{{ comment }}</textarea>#}
+                              </div>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                          </div>
+                            </form>
+                        </div>
+                      </div>
+                    </div>
                     {% endifequal %}
                 </li>
                     <div class="mb-2"></div>

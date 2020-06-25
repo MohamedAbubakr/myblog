@@ -20,13 +20,15 @@
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">{{ form.username.label_tag }}</label>
         <div class="col-sm-5">
-            {{ form.username }}
+            <input type="text" name="username" class="form-control" autofocus required id="id_username">
+{#            {{ form.username }}#}
         </div>
     </div>
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">{{ form.password.label_tag }}</label>
         <div class="col-sm-5">
-            {{ form.password }}
+            <input type="password" name="password" class="form-control" required id="id_password">
+{#            {{ form.password }}#}
         </div>
     </div>
 
