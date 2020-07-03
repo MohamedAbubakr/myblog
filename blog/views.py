@@ -1,6 +1,6 @@
 from django.views import generic
 from django.contrib.auth.models import User
-from .models import Blog, Author, Comment
+from .models import Blog, Author, Comment, Audio
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.generic.edit import CreateView, FormMixin
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
-from .forms import CommentForm
+from .forms import CommentForm, AudioForm
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -129,6 +129,15 @@ def update_comment(request, comment_id):
     return redirect('/blog/' + str(pk))
 
 
+@csrf_exempt
+def add_audio(request):
+    form = AudioForm(request.POST or None)
+    form.instance.author = request.user
+    form.save()
+
+    return redirect('/blog/audio/')
+
+
 class CreateAuthor(LoginRequiredMixin, CreateView):
     model = Author
     fields = ['name', 'bio', ]
@@ -156,3 +165,8 @@ class CreateBlog(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse('blogs')
+
+
+class AudioListView(generic.ListView):
+    def get_queryset(self):
+        return Audio.objects.filter(author_id=self.request.user.id)

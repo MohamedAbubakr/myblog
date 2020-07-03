@@ -15,4 +15,6 @@ urlpatterns = [
     path(r'^signup/$', views.signup, name='signup'),
     path('delete_comment/<int:comment_id>', views.delete_comment, name='comment-delete'),
     path('update_comment/<int:comment_id>', views.update_comment, name='comment-update'),
+    path('audio/', views.AudioListView.as_view(), name='audio-list'),
+    path('audio/add_audio', views.add_audio, name='add-audio'),
 ]

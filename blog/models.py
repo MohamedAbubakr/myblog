@@ -46,3 +46,13 @@ class Comment(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a particular author instance."""
         return reverse('blogs')
+
+
+class Audio(models.Model):
+    name = models.TextField(null=False)
+    url = models.TextField(null=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
